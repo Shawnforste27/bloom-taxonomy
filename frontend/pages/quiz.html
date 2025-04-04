@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quiz Challenge</title>
+    <link rel="stylesheet" href="../css/styles/features.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">AI Quiz Challenge</div>
+        <div class="nav-user">
+            <span id="username"></span>
+            <button onclick="location.href='index.html'">Back to Dashboard</button>
+            
+        </div>
+    </nav>
+    <div class="container">
+        <div class="quiz-setup">
+            <input type="text" id="subjectInput" placeholder="Enter subject">
+            <select id="difficultySelect">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button id="generateBtn">Generate Question</button>
+        </div>
+        <div class="quiz-content">
+            <div id="questionDisplay" class="question-box"></div>
+            <div id="answerSection" style="display: none;">
+                <select id="bloomsSelect">
+                    <option value="">Select Bloom's Level</option>
+                    <option value="remember">Remember</option>
+                    <option value="understand">Understand</option>
+                    <option value="apply">Apply</option>
+                    <option value="analyze">Analyze</option>
+                    <option value="evaluate">Evaluate</option>
+                    <option value="create">Create</option>
+                </select>
+                <textarea id="answerInput" maxlength="200" placeholder="Write your answer (max 200 words)"></textarea>
+                <button id="submitAnswer">Submit Answer</button>
+            </div>
+            <div id="feedback" class="feedback-box"></div>
+        </div>
+    </div>
+    <script src="../js/scripts/quiz.js"></script>
+</body>
+</html>

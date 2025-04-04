@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../css/styles/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Q/PAPER MODERATION AS PER OBE</div>
+    </nav>
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-card" onclick="navigateTo('question-search')">
+                <h3>Bloom's Taxonomy Classifier</h3>
+                <p>Analyze and classify questions according to Bloom's Taxonomy levels. Helps in understanding the cognitive complexity of
+                questions and ensures balanced assessment.</p>
+            </div>
+            <div class="feature-card" onclick="navigateTo('questionpaper')">
+                <h3>Question Paper Generator</h3>
+                <p>Generate balanced question papers with customizable parameters and Bloom's Taxonomy distribution.</p>
+            </div>
+            <div class="feature-card" onclick="navigateTo('quiz')">
+                <h3>AI Quiz Challenge</h3>
+                <p>Test your knowledge</p>
+            </div>
+        </div>
+    </div>
+    <script src="../js/scripts/dashboard.js"></script>
+</body>
+</html>
