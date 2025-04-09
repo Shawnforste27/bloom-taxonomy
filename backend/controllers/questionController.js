@@ -22,20 +22,43 @@ exports.generateQuestionPaper = async (req, res) => {
             }
         } = req.body;
 
-        // Calculate questions and marks per level
+        // Calculate questions per level more accurately
         const questionsPerLevel = {};
-        let remainingMarks = totalMarks;
-        let remainingQuestions = totalQuestions;
-        
-        Object.entries(bloomsDistribution).forEach(([level, percentage], index, array) => {
-            const isLast = index === array.length - 1;
-            if (isLast) {
-                questionsPerLevel[level] = remainingQuestions;
-            } else {
-                questionsPerLevel[level] = Math.round((percentage / 100) * totalQuestions);
-                remainingQuestions -= questionsPerLevel[level];
-            }
+        let assignedQuestions = 0;
+
+        // Sort levels by percentage (descending) to prioritize higher percentages
+        const sortedLevels = Object.entries(bloomsDistribution)
+            .sort((a, b) => b[1] - a[1]);
+
+        // First pass: Assign floor values to ensure we don't exceed total
+        sortedLevels.forEach(([level, percentage]) => {
+            const exactQuestions = (percentage / 100) * totalQuestions;
+            questionsPerLevel[level] = Math.floor(exactQuestions);
+            assignedQuestions += questionsPerLevel[level];
         });
+
+        // Second pass: Distribute remaining questions to levels with highest decimal parts
+        if (assignedQuestions < totalQuestions) {
+            const remainingQuestions = totalQuestions - assignedQuestions;
+            const decimalParts = sortedLevels.map(([level, percentage]) => {
+                const exactQuestions = (percentage / 100) * totalQuestions;
+                return {
+                    level,
+                    decimal: exactQuestions - Math.floor(exactQuestions)
+                };
+            }).sort((a, b) => b.decimal - a.decimal);
+
+            // Assign remaining questions to levels with highest decimal parts
+            for (let i = 0; i < remainingQuestions; i++) {
+                if (decimalParts[i]) {
+                    questionsPerLevel[decimalParts[i].level]++;
+                }
+            }
+        }
+
+        // Verify total questions match
+        const totalCalculatedQuestions = Object.values(questionsPerLevel).reduce((sum, count) => sum + count, 0);
+        console.log(`Total questions: requested=${totalQuestions}, calculated=${totalCalculatedQuestions}`);
 
         const questions = [];
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -57,9 +80,10 @@ exports.generateQuestionPaper = async (req, res) => {
                 const result = await model.generateContent(prompt);
                 const response = await result.response;
                 const text = response.text();
-                
+
                 const generatedQuestions = text.split('\n')
                     .filter(q => q.trim().length > 0)
+                    .slice(0, count) // Ensure we only take exactly the number we requested
                     .map((q, index) => ({
                         text: q.replace(/^\d+[\.)]\s*/, '').trim(),
                         marks: marksPerQuestion,
@@ -70,6 +94,11 @@ exports.generateQuestionPaper = async (req, res) => {
 
                 questions.push(...generatedQuestions);
             }
+        }
+
+        // Make sure we don't exceed the total number of questions
+        if (questions.length > totalQuestions) {
+            questions.splice(totalQuestions);
         }
 
         // Adjust marks if necessary
